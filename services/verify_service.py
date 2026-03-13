@@ -1,42 +1,37 @@
-from scanner.scanner import capture, connect
-from database.db import get_connection
+from core.matcher import FingerprintMatcher
 from config import MATCH_THRESHOLD
 
+class VerifyService:
 
-def verify_user(nik):
+    def __init__(self, scanner, repository):
 
-    conn = get_connection()
-    cur = conn.cursor()
+        self.scanner = scanner
+        self.repo = repository
+        self.matcher = FingerprintMatcher()
 
-    cur.execute(
-        "SELECT name, fingerprint_template FROM users WHERE nik=?",
-        (nik,)
-    )
 
-    user = cur.fetchone()
+    def verify(self, nik):
 
-    if not user:
-        print("NIK tidak ditemukan")
-        return
+        user = self.repo.find_by_nik(nik)
 
-    name, template = user
+        if not user:
+            return None
 
-    probe = capture()
+        scanned_template = self.scanner.capture()
 
-    f = connect()
+        score = self.matcher.compare(
+            scanned_template,
+            user[3]
+        )
 
-    f.uploadCharacteristics(0x01, list(probe))
-    f.uploadCharacteristics(0x02, list(template))
+        
 
-    score = f.compareCharacteristics()
+        if score > MATCH_THRESHOLD:
 
-    if score > MATCH_THRESHOLD:
+            self.repo.log_verification(user.id, "SUCCESS")
+        
+            return user
+        
+        self.repo.log_verification(user.id, "FAILED")
 
-        print("VERIFIED")
-        print("Nama :", name)
-        print("NIK :", nik)
-        print("Score :", score)
-
-    else:
-
-        print("Fingerprint tidak cocok")
+        return None

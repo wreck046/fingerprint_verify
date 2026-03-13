@@ -1,5 +1,7 @@
-def compare(template1, template2):
+class FingerprintMatcher:
 
-    score = sum(a == b for a,b in zip(template1, template2))
+    def compare(self, template1, template2):
 
-    return score
+        score = sum(a == b for a, b in zip(template1, template2))
+
+        return score

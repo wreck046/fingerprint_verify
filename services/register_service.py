@@ -1,19 +1,13 @@
-from scanner.scanner import capture
-from database.db import get_connection
+class RegisterService:
 
-def register_user(name, nik):
+    def __init__(self, scanner, repository):
 
-    template = capture()
+        self.scanner = scanner
+        self.repo = repository
 
-    conn = get_connection()
-    cur = conn.cursor()
 
-    cur.execute(
-        "INSERT INTO users(name, nik, fingerprint_template) VALUES (?,?,?)",
-        (name, nik, template)
-    )
+    def register(self, name, nik):
 
-    conn.commit()
-    conn.close()
+        template = self.scanner.capture()
 
-    print("User berhasil terdaftar")
+        self.repo.save(name, nik, template)

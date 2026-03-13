@@ -1,6 +1,7 @@
 DATABASE = "finger.db"
 
-SERIAL_PORT = "COM3"   # ganti sesuai scanner
+SERIAL_PORT = "COM3"
+
 BAUDRATE = 57600
 
 MATCH_THRESHOLD = 40
