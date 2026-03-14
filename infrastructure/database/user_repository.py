@@ -1,32 +1,36 @@
 from core.entities import User
+from infrastructure.database.db import get_connection
 
-def find_by_nik(self, nik):
 
-    conn = get_connection()
-    cur = conn.cursor()
+class UserRepository:
 
-    cur.execute(
-        "SELECT id,name,nik,template FROM users WHERE nik=?",
-        (nik,)
-    )
+    def find_by_nik(self, nik):
 
-    row = cur.fetchone()
-    conn.close()
+        conn = get_connection()
+        cur = conn.cursor()
 
-    if row:
+        cur.execute(
+            "SELECT id,name,nik,template FROM users WHERE nik=?",
+            (nik,)
+        )
+
+        row = cur.fetchone()
+        conn.close()
+
+        if not row:
+            return None
+
         return User(*row)
+    
+    def log_verification(self, user_id, result):
 
-    return None
+        conn = get_connection()
+        cur = conn.cursor()
 
-def log_verification(self, user_id, result):
+        cur.execute(
+            "INSERT INTO verification_logs(user_id,result) VALUES (?,?)",
+            (user_id, result)
+        )
 
-    conn = get_connection()
-    cur = conn.cursor()
-
-    cur.execute(
-        "INSERT INTO verification_logs(user_id,result) VALUES (?,?)",
-        (user_id, result)
-    )
-
-    conn.commit()
-    conn.close()
+        conn.commit()
+        conn.close()

@@ -1,5 +1,6 @@
 import serial.tools.list_ports
 
+
 def detect_scanner():
 
     ports = serial.tools.list_ports.comports()

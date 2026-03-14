@@ -21,10 +21,8 @@ class VerifyService:
 
         score = self.matcher.compare(
             scanned_template,
-            user[3]
+            user.template
         )
-
-        
 
         if score > MATCH_THRESHOLD:
 

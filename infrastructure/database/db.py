@@ -20,6 +20,7 @@ def init_db():
         result TEXT
     )
     """)
+
     cur.execute("""
     CREATE TABLE IF NOT EXISTS users(
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -29,5 +30,14 @@ def init_db():
     )
     """)
 
+    cur.execute("""
+    CREATE TABLE IF NOT EXISTS verification_logs(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER,
+        timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+        result TEXT
+    )
+    """)
+    
     conn.commit()
     conn.close()

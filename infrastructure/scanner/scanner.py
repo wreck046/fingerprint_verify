@@ -1,15 +1,18 @@
 from pyfingerprint.pyfingerprint import PyFingerprint
-from config import SERIAL_PORT, BAUDRATE
 from scanner.autodetect import detect_scanner
+from config import BAUDRATE
+
 
 class FingerprintScanner:
+
+    MAX_RETRY = 3
 
     def __init__(self):
 
         port = detect_scanner()
 
         if not port:
-            raise Exception("Scanner not found")
+            raise Exception("Fingerprint scanner not found")
 
         self.device = PyFingerprint(
             port,
@@ -18,49 +21,33 @@ class FingerprintScanner:
             0x00000000
         )
 
-        self.device = PyFingerprint(
-            SERIAL_PORT,
-            BAUDRATE,
-            0xFFFFFFFF,
-            0x00000000
-        )
-
         if not self.device.verifyPassword():
-            raise Exception("Scanner not detected")
+            raise Exception("Scanner password verification failed")
 
 
     def capture(self):
 
-        while not self.device.readImage():
-            pass
-
-        self.device.convertImage(0x01)
-
-        template = self.device.downloadCharacteristics(0x01)
-
-        return bytes(template)
-    
-    MAX_RETRY = 3
-
-    def capture(self):
-    
         retry = 0
-    
-        while retry < MAX_RETRY:
-        
+
+        while retry < self.MAX_RETRY:
+
             try:
-            
+
+                print("Place finger on scanner...")
+
                 while not self.device.readImage():
                     pass
-                
+
                 self.device.convertImage(0x01)
-    
+
                 template = self.device.downloadCharacteristics(0x01)
-    
+
                 return bytes(template)
-    
-            except Exception:
-            
+
+            except Exception as e:
+
+                print("Capture error:", e)
+
                 retry += 1
-    
-        raise Exception("Fingerprint capture failed")
+
+        raise Exception("Fingerprint capture failed after retries")
