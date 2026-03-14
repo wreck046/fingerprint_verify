@@ -34,3 +34,31 @@ class UserRepository:
 
         conn.commit()
         conn.close()
+
+    def save_fingerprint(self, user_id, template):
+
+        conn = get_connection()
+        cur = conn.cursor()
+
+        cur.execute(
+            "INSERT INTO fingerprints(user_id,template) VALUES (?,?)",
+            (user_id, template)
+        )
+
+        conn.commit()
+        conn.close()
+
+    def get_fingerprints(self, user_id):
+
+        conn = get_connection()
+        cur = conn.cursor()
+    
+        cur.execute(
+            "SELECT template FROM fingerprints WHERE user_id=?",
+            (user_id,)
+        )
+    
+        rows = cur.fetchall()
+        conn.close()
+    
+        return [row[0] for row in rows]

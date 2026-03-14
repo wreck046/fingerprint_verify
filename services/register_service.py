@@ -1,5 +1,7 @@
 class RegisterService:
 
+    ENROLL_COUNT = 3
+
     def __init__(self, scanner, repository):
 
         self.scanner = scanner
@@ -8,6 +10,14 @@ class RegisterService:
 
     def register(self, name, nik):
 
-        template = self.scanner.capture()
+        user_id = self.repo.create_user(name, nik)
 
-        self.repo.save(name, nik, template)
+        for i in range(self.ENROLL_COUNT):
+
+            print(f"Scan fingerprint {i+1}/{self.ENROLL_COUNT}")
+
+            template = self.scanner.capture()
+
+            self.repo.save_fingerprint(user_id, template)
+
+        print("Enrollment complete")

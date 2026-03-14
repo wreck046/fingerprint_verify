@@ -3,11 +3,11 @@ from config import MATCH_THRESHOLD
 
 class VerifyService:
 
-    def __init__(self, scanner, repository):
+    def __init__(self, scanner, repo, matcher):
 
         self.scanner = scanner
-        self.repo = repository
-        self.matcher = FingerprintMatcher()
+        self.repo = repo
+        self.matcher = matcher
 
 
     def verify(self, nik):
@@ -17,19 +17,17 @@ class VerifyService:
         if not user:
             return None
 
-        scanned_template = self.scanner.capture()
+        templates = self.repo.get_fingerprints(user.id)
 
-        score = self.matcher.compare(
-            scanned_template,
-            user.template
+        scanned = self.scanner.capture()
+
+        match, score = self.matcher.match(
+            scanned,
+            templates,
+            threshold=0.6
         )
 
-        if score > MATCH_THRESHOLD:
-
-            self.repo.log_verification(user.id, "SUCCESS")
-        
+        if match:
             return user
-        
-        self.repo.log_verification(user.id, "FAILED")
 
         return None
