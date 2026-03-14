@@ -52,13 +52,42 @@ class UserRepository:
 
         conn = get_connection()
         cur = conn.cursor()
-    
+
         cur.execute(
             "SELECT template FROM fingerprints WHERE user_id=?",
             (user_id,)
         )
-    
+
         rows = cur.fetchall()
         conn.close()
-    
+
         return [row[0] for row in rows]
+    
+    def get_all_users(self):
+
+        conn = get_connection()
+        cur = conn.cursor()
+
+        cur.execute("SELECT id,name,nik FROM users")
+
+        rows = cur.fetchall()
+        conn.close()
+
+        return rows
+
+    def get_logs(self):
+
+        conn = get_connection()
+        cur = conn.cursor()
+
+        cur.execute("""
+        SELECT users.name, verification_logs.timestamp, verification_logs.result
+        FROM verification_logs
+        JOIN users ON users.id = verification_logs.user_id
+        ORDER BY timestamp DESC
+        """)
+
+        rows = cur.fetchall()
+        conn.close()
+
+        return rows

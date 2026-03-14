@@ -1,23 +1,28 @@
+from core.quality import FingerprintQuality
+
 class RegisterService:
 
     ENROLL_COUNT = 3
 
-    def __init__(self, scanner, repository):
-
+    def __init__(self, scanner, repo):
         self.scanner = scanner
-        self.repo = repository
+        self.repo = repo
+        self.quality = FingerprintQuality()
 
 
     def register(self, name, nik):
 
         user_id = self.repo.create_user(name, nik)
 
-        for i in range(self.ENROLL_COUNT):
-
-            print(f"Scan fingerprint {i+1}/{self.ENROLL_COUNT}")
+        enrolled = 0
+        while enrolled < self.ENROLL_COUNT:
+            print(f"Scan fingerprint {enrolled+1}/{self.ENROLL_COUNT}")
 
             template = self.scanner.capture()
 
-            self.repo.save_fingerprint(user_id, template)
+            if not self.quality.is_good(template):
+                print("Fingerprint quality too low. Please scan again.")
+                continue
 
-        print("Enrollment complete")
+            self.repo.save_fingerprint(user_id, template)
+            enrolled += 1

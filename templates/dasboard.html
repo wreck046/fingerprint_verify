@@ -1,24 +1,35 @@
-<html>
-  <head>
-    <title>Fingerprint System</title>
-  </head>
+<h2>Users</h2>
 
-  <body>
-    <h2>Fingerprint Verification</h2>
+<table border="1">
+  <tr>
+    <th>ID</th>
+    <th>Name</th>
+    <th>NIK</th>
+  </tr>
 
-    <form method="POST">
-      NIK:<br />
-      <input name="nik" />
+  {% for user in users %}
+  <tr>
+    <td>{{user[0]}}</td>
+    <td>{{user[1]}}</td>
+    <td>{{user[2]}}</td>
+  </tr>
+  {% endfor %}
+</table>
 
-      <br /><br />
+<h2>Verification Logs</h2>
 
-      <button type="submit">Verify</button>
-    </form>
+<table border="1">
+  <tr>
+    <th>Name</th>
+    <th>Time</th>
+    <th>Result</th>
+  </tr>
 
-    {% if result %}
-
-    <h3>Result: {{result}}</h3>
-
-    {% endif %}
-  </body>
-</html>
+  {% for log in logs %}
+  <tr>
+    <td>{{log[0]}}</td>
+    <td>{{log[1]}}</td>
+    <td>{{log[2]}}</td>
+  </tr>
+  {% endfor %}
+</table>
